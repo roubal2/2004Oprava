@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp"
+      crossorigin="anonymous"
+    />
+    <title>Tabulka</title>
+</head>
+<body>
+    <h1>API Tabulka</h1>
+
+    <div>
+        <label for="num-records-inpput">Počet záznamů:</label>
+        <input type="number" id="num-records-input" name="num-records-input" min="1" value="10">
+        <button id="refresh-button">Refresh</button>
+        <button id="delete-button">Delete</button>
+    </div>
+
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>API</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        var numRecordsInput = document.getElementById('num-records-input');
+		var refreshButton = document.getElementById('refresh-button');
+		var deleteButton = document.getElementById('delete-button');
+		var dataTableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+		var localStorageKey = 'apiData';
+        const apiUrl = "https://dog.ceo/api";
+        const apiName = "breeds/list/all";
+
+		function displayDataInTable(data) {
+			dataTableBody.innerHTML = '';
+
+			data.forEach(function(item) {
+				var row = dataTableBody.insertRow();
+				var apiCell = row.insertCell(0);
+				var dataCell = row.insertCell(1);
+				apiCell.innerHTML = item.api;
+				dataCell.innerHTML = item.data;
+			});
+		}
+
+		function getDataFromAPI(apiUrl, apiName, numRecords, callback) {
+			var requestUrl = apiUrl + '?count=' + numRecords;
+			var request = new XMLHttpRequest();
+			request.open('GET', requestUrl, true);
+
+			request.onload = function() {
+				if (request.status >= 200 && request.status < 400) {
+					var data = JSON.parse(request.responseText);
+					callback(data, apiName);
+				} else {
+					console.error('Error getting data from API: ' + apiName);
+				}
+			};
+
+			request.onerror = function() {
+				console.error('Error getting data from API: ' + apiName);
+			};
+
+			request.send();
+		}
+
+		function getDataFromLocalStorage() {
+			var data = localStorage.getItem(localStorageKey);
+			if (data) {
+				return JSON.parse(data);
+            }   
+        }
+    </script>
+</body>
+</html>
